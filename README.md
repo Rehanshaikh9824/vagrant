@@ -1,1 +1,37 @@
 # vagrant
+
+Vagrant.configure("2") do |config|
+  # Use the bento/ubuntu-24.04 box
+  config.vm.box = "bento/ubuntu-24.04"
+  config.vm.box_check_update = false
+
+  # Disable default synced folder (optional)
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+
+  # Public bridged network (VM gets an IP from your router)
+  config.vm.network "public_network"
+
+  # Minimal provisioning
+  config.vm.provision "shell", inline: <<-SHELL
+    echo "Minimal provisioning complete"
+  SHELL
+
+  # VirtualBox optimizations
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "2048"
+    vb.cpus = 2
+    vb.gui = false
+    
+    # Performance tweaks
+    vb.customize ["modifyvm", :id, "--ioapic", "on"]
+    vb.customize ["modifyvm", :id, "--rtcuseutc", "on"]
+    vb.customize ["modifyvm", :id, "--vtxvpid", "on"]
+    vb.customize ["modifyvm", :id, "--hwvirtex", "on"]
+    vb.customize ["modifyvm", :id, "--nestedpaging", "on"]
+    vb.customize ["modifyvm", :id, "--largepages", "on"]
+  end
+
+  # Faster boot & SSH
+  config.vm.boot_timeout = 600
+  config.ssh.insert_key = false
+end
